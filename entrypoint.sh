@@ -59,7 +59,7 @@ if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
   iptables -A FORWARD -p udp -d "$PF_DEST_IP" --dport "$PF_PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
   iptables -t nat -A POSTROUTING -d "$PF_DEST_IP" -p udp --dport "$PF_PORT" -j MASQUERADE
 
-  echo "$(date): Forwarding incoming VPN traffic on port $PF_PORT to $PF_DEST_IP:$PF_DEST_PORT"
+  echo "$(date): Forwarding incoming VPN traffic on port $PF_PORT to $PF_DEST_IP:$PF_PORT"
 fi
 
 shutdown () {
