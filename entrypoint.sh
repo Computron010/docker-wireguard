@@ -50,6 +50,18 @@ do
 	iptables -I OUTPUT -d $local_subnet -j ACCEPT
 done
 
+if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
+  iptables -t nat -A PREROUTING -i wg0 -p tcp --dport "$PF_PORT" -j DNAT --to-destination "$PF_DEST_IP":"$PF_PORT"
+  iptables -A FORWARD -p tcp -d "$PF_DEST_IP" --dport "$PF_PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+  iptables -t nat -A POSTROUTING -d "$PF_DEST_IP" -p tcp --dport "$PF_PORT" -j MASQUERADE
+  
+  iptables -t nat -A PREROUTING -i wg0 -p udp --dport "$PF_PORT" -j DNAT --to-destination "$PF_DEST_IP":"$PF_DEST_IP"
+  iptables -A FORWARD -p udp -d "$PF_DEST_IP" --dport "$PF_PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+  iptables -t nat -A POSTROUTING -d "$PF_DEST_IP" -p udp --dport "$PF_PORT" -j MASQUERADE
+
+  echo "$(date): Forwarding incoming VPN traffic on port $PF_PORT to $PF_DEST_IP:$PF_DEST_PORT"
+fi
+
 shutdown () {
 	wg-quick down $interface
 	exit 0
