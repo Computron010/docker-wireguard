@@ -51,7 +51,7 @@ do
 done
 
 if [ -n "$NATPMP_ENABLE" ]; then
-  bash natpmp.sh 10.2.0.1 &
+  bash natpmp.sh ${NATPMP_IP:-10.2.0.1} &
   
   sleep 2
 fi
@@ -59,7 +59,7 @@ fi
 if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
   if [ "$NATPMP_ENABLE" -eq 1 ]; then
     PORT=$(grep 'Mapped public port' /tmp/natpmp_output | grep 'protocol TCP' | awk '{print $4}')
-    PUBLIC_IP=$(grep 'Public IP address' /tmp/natpmp_output | awk '{print $NF}')
+    PUBLIC_IP=$(grep 'Public IP address' /tmp/natpmp_output | awk '{print $NF}' | head -1)
     
     iptables -t nat -A PREROUTING -i wg0 -p tcp --dport "$PORT" -j DNAT --to-destination "$PF_DEST_IP":"$PF_PORT"
     iptables -A FORWARD -p tcp -d "$PF_DEST_IP" --dport "$PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
