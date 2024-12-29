@@ -56,7 +56,7 @@ if [ -n "$NATPMP_ENABLE" ]; then
   sleep 2
 fi
 
-if [ -n "$PF_DEST_IP" ]; then
+if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
   if [ -n "$NATPMP_ENABLE" ]; then
     PORT=$(grep 'Mapped public port' /tmp/natpmp_output | grep 'protocol TCP' | awk '{print $4}')
     PUBLIC_IP=$(grep 'Public IP address' /tmp/natpmp_output | awk '{print $NF}')
@@ -70,7 +70,7 @@ if [ -n "$PF_DEST_IP" ]; then
     iptables -t nat -A POSTROUTING -d "$PF_DEST_IP" -p udp --dport "$PF_PORT" -j MASQUERADE
     
     echo "Forwarding incoming VPN traffic from $PUBLIC_IP:$PORT to $PF_DEST_IP:$PF_PORT"
-  elif [ -n "$PF_PORT" ]; then
+  else
     iptables -t nat -A PREROUTING -i wg0 -p tcp --dport "$PF_PORT" -j DNAT --to-destination "$PF_DEST_IP":"$PF_PORT"
     iptables -A FORWARD -p tcp -d "$PF_DEST_IP" --dport "$PF_PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
     iptables -t nat -A POSTROUTING -d "$PF_DEST_IP" -p tcp --dport "$PF_PORT" -j MASQUERADE
@@ -81,8 +81,6 @@ if [ -n "$PF_DEST_IP" ]; then
     
     WG_IP=$(wg show wg0 endpoints | awk '{print $2}' | cut -d: -f1)
     echo "Forwarding incoming VPN traffic from $WG_IP:$PF_PORT to $PF_DEST_IP:$PF_PORT"
-  else
-    echo "One of PF_PORT or NATPMP_ENABLE needs to be set"
   fi
 fi
 
