@@ -60,6 +60,9 @@ if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
   if [ "$NATPMP_ENABLE" -eq 1 ]; then
     PORT=$(grep 'Mapped public port' /tmp/natpmp_output | grep 'protocol TCP' | awk '{print $4}')
     PUBLIC_IP=$(grep 'Public IP address' /tmp/natpmp_output | awk '{print $NF}' | head -1)
+
+    mkdir -p /shared/
+    echo "$PORT" > /shared/port.dat
     
     iptables -t nat -A PREROUTING -i wg0 -p tcp --dport "$PORT" -j DNAT --to-destination "$PF_DEST_IP":"$PF_PORT"
     iptables -A FORWARD -p tcp -d "$PF_DEST_IP" --dport "$PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
