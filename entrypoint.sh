@@ -63,7 +63,7 @@ if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
 
     mkdir -p /shared/
     echo "$PORT" > /shared/port.dat
-    echi "$PUBLIC_IP" > /shared/public_ip.dat
+    echo "$PUBLIC_IP" > /shared/public_ip.dat
     
     iptables -t nat -A PREROUTING -i wg0 -p tcp --dport "$PORT" -j DNAT --to-destination "$PF_DEST_IP":"$PF_PORT"
     iptables -A FORWARD -p tcp -d "$PF_DEST_IP" --dport "$PORT" -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
