@@ -51,13 +51,13 @@ do
 done
 
 if [ -n "$NATPMP_ENABLE" ]; then
-  bash natpmp_script.sh &
+  bash natpmp.sh &
   
   sleep 2
 fi
 
 if [ -n "$PF_PORT" ] && [ -n "$PF_DEST_IP" ]; then
-  if [ -n "$NATPMP_ENABLE" ]; then
+  if [ "$NATPMP_ENABLE" -eq 1 ]; then
     PORT=$(grep 'Mapped public port' /tmp/natpmp_output | grep 'protocol TCP' | awk '{print $4}')
     PUBLIC_IP=$(grep 'Public IP address' /tmp/natpmp_output | awk '{print $NF}')
     
