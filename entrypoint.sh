@@ -51,7 +51,7 @@ do
 done
 
 if [ -n "$NATPMP_ENABLE" ]; then
-  bash natpmp.sh &
+  bash natpmp.sh 10.2.0.1 &
   
   sleep 2
 fi
