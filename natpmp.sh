@@ -19,7 +19,8 @@ fi
 
 sleep 45
 while true; do
-    natpmpc -a 1 0 udp 60 -g "$NATPMP_IP" && natpmpc -a 1 0 tcp 60 -g "$NATPMP_IP"
+    natpmpc -a 1 0 udp 60 -g "$NATPMP_IP" > /dev/null
+    natpmpc -a 1 0 tcp 60 -g "$NATPMP_IP" > /dev/null
     
     if [ $? -ne 0 ]; then
         echo -e "ERROR with natpmpc command \a"
